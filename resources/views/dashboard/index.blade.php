@@ -8,6 +8,17 @@
         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
     </h1>
 </div>
+    @if(Auth::user()->isAdmin())
+    <div class="alert alert-info">
+        <i class="fas fa-user-shield me-2"></i>
+        <strong>Modo Administrador:</strong> Tienes acceso completo a todos los módulos.
+    </div>
+    @else
+    <div class="alert alert-warning">
+        <i class="fas fa-user-check me-2"></i>
+        <strong>Modo Operador:</strong> Puedes gestionar inventario y colaboradores.
+    </div>
+    @endif
 
 <!-- Estadísticas -->
 <div class="row mb-4">
