@@ -27,10 +27,11 @@ class User extends Authenticatable
         'active' => 'boolean',
     ];
 
+    // Verificar si es administrador
     public function isAdmin()
-{
-    return $this->role === 'admin';
-}
+    {
+        return $this->role === 'admin';
+    }
 
     // Verificar si está activo
     public function isActive()

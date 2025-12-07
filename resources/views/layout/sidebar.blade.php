@@ -16,6 +16,11 @@
                     <i class="fas fa-users me-2"></i>Colaboradores
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('assignments.*') ? 'active' : '' }}" href="{{ route('assignments.index') }}">
+                    <i class="fas fa-handshake me-2"></i>Asignaciones</a>
+            </li>
             
             {{-- SOLO PARA ADMINISTRADORES --}}
             @if(Auth::user()->isAdmin())

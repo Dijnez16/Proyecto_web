@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Inventory extends Model
 {
     use HasFactory;
 
-    // ESPECIFICAR EL NOMBRE DE LA TABLA - AGREGAR ESTA LÍNEA
+    // ESPECIFICAR EL NOMBRE DE LA TABLA
     protected $table = 'inventory';
 
     protected $fillable = [
@@ -71,5 +72,31 @@ class Inventory extends Model
     public function getTypeNameAttribute()
     {
         return $this->type == 'hardware' ? 'Hardware' : 'Software';
+    }
+
+    // SCOPE PARA FILTROS - AGREGADO
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('brand', 'like', '%' . $search . '%')
+                    ->orWhere('serial_number', 'like', '%' . $search . '%');
+            });
+        });
+
+        $query->when($filters['type'] ?? false, function ($query, $type) {
+            $query->where('type', $type);
+        });
+
+        $query->when($filters['category'] ?? false, function ($query, $category) {
+            $query->where('category_id', $category);
+        });
+
+        $query->when($filters['status'] ?? false, function ($query, $status) {
+            $query->where('status', $status);
+        });
+
+        return $query;
     }
 }

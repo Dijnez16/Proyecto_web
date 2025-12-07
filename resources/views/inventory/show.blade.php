@@ -136,6 +136,56 @@
                 @endif
             </div>
         </div>
+        <<!-- Sección QR - FUNCIONA CON RUTA LOCAL -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-qrcode me-2"></i>Código QR del Equipo
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                @if($inventory->qr_code)
+                    <img src="{{ asset('storage/' . $inventory->qr_code) }}" 
+                        alt="QR Code {{ $inventory->name }}"
+                        class="img-fluid rounded border" 
+                        style="max-width: 200px;">
+                    <p class="mt-2">
+                        <small class="text-muted">
+                            Escanear para ver información del equipo
+                        </small>
+                    </p>
+                    <div class="mt-2">
+                        <a href="{{ asset('storage/' . $inventory->qr_code) }}" 
+                        download="QR-{{ $inventory->name }}.png"
+                        class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-download me-1"></i>Descargar
+                        </a>
+                        <form action="{{ route('inventory.generate-qr', $inventory) }}" 
+                            method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-warning">
+                                <i class="fas fa-sync me-1"></i>Regenerar
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                        style="height: 200px;">
+                        <div>
+                            <i class="fas fa-qrcode fa-3x text-muted"></i>
+                            <p class="text-muted mt-2 mb-0">QR no generado</p>
+                            <form action="{{ route('inventory.generate-qr', $inventory) }}" 
+                                method="POST" class="mt-2">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-qrcode me-1"></i>Generar QR
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
         
         <!-- Historial de Asignaciones -->
         @if($inventory->assignments->count() > 0)

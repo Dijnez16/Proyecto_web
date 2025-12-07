@@ -8,6 +8,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\AssignmentController;
 
 // ==================== RUTAS PÚBLICAS ====================
 
@@ -33,6 +34,13 @@ Route::middleware(['auth'])->group(function () {
     
     // Gestión de Inventario
     Route::resource('inventory', InventoryController::class);
+
+    // Ruta para generar QR
+    Route::post('/inventory/{inventory}/generate-qr', [InventoryController::class, 'generateQR'])->name('inventory.generate-qr');
+
+    // Gestión de Asignaciones
+    Route::resource('assignments', AssignmentController::class);
+    Route::post('/assignments/{assignment}/return', [AssignmentController::class, 'returnEquipment'])->name('assignments.return');
     
     // Cambiar estado de equipo (ruta adicional)
     Route::post('/inventory/{inventory}/update-status', [InventoryController::class, 'updateStatus'])->name('inventory.update-status');

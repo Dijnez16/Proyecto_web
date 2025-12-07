@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Inventory;
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
 
 class InventoryController extends Controller
 {
@@ -51,7 +55,10 @@ class InventoryController extends Controller
         }
 
         // Crear equipo
-        Inventory::create($validated);
+        $inventory = Inventory::create($validated);
+
+        // Generar QR automáticamente
+        $this->generateQRCode($inventory);
 
         return redirect()->route('inventory.index')
             ->with('success', 'Equipo agregado al inventario correctamente.');
@@ -99,6 +106,11 @@ class InventoryController extends Controller
         // Actualizar equipo
         $inventory->update($validated);
 
+        // Generar QR si no existe
+        if (!$inventory->qr_code) {
+            $this->generateQRCode($inventory);
+        }
+
         return redirect()->route('inventory.index')
             ->with('success', 'Equipo actualizado correctamente.');
     }
@@ -113,5 +125,78 @@ class InventoryController extends Controller
         $inventory->update(['status' => $request->status]);
 
         return back()->with('success', 'Estado del equipo actualizado correctamente.');
+    }
+
+    // Generar código QR para equipo
+    public function generateQR(Inventory $inventory)
+    {
+        $this->generateQRCode($inventory);
+        return back()->with('success', 'Código QR generado correctamente.');
+    }
+
+    // MÉTODO QR DEFINITIVO
+   private function generateQRCode(Inventory $inventory)
+{
+    // 1. Preparar datos
+    $data = "Sistema CMDB\n" .
+            "=============\n" .
+            "ID: {$inventory->id}\n" .
+            "Nombre: {$inventory->name}\n" .
+            "Tipo: {$inventory->type}\n" .
+            "Categoría: {$inventory->category->name}\n" .
+            "Serie: " . ($inventory->serial_number ?? 'N/A') . "\n" .
+            "Fecha Ingreso: " . $inventory->entry_date->format('d/m/Y') . "\n" .
+            "Estado: {$inventory->status}";
+    
+    // 2. Crear directorio
+    $directory = storage_path('app/public/qr_codes');
+    if (!is_dir($directory)) {
+        mkdir($directory, 0777, true);
+    }
+    
+    // 3. Generar QR (VERSIÓN 6.x)
+    $qrCode = QrCode::create($data)
+        ->setSize(200)
+        ->setMargin(10);
+    
+    $writer = new PngWriter();
+    $result = $writer->write($qrCode);
+    
+    // 4. Guardar archivo
+    $filename = 'qr_' . $inventory->id . '_' . time() . '.png';
+    $filepath = $directory . '/' . $filename;
+    $result->saveToFile($filepath);
+    
+    // 5. Guardar referencia en BD
+    $relativePath = 'qr_codes/' . $filename;
+    $inventory->update(['qr_code' => $relativePath]);
+    
+    return $relativePath;
+}
+
+    // SCOPE PARA FILTROS
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('brand', 'like', '%' . $search . '%')
+                    ->orWhere('serial_number', 'like', '%' . $search . '%');
+            });
+        });
+
+        $query->when($filters['type'] ?? false, function ($query, $type) {
+            $query->where('type', $type);
+        });
+
+        $query->when($filters['category'] ?? false, function ($query, $category) {
+            $query->where('category_id', $category);
+        });
+
+        $query->when($filters['status'] ?? false, function ($query, $status) {
+            $query->where('status', $status);
+        });
+
+        return $query;
     }
 }

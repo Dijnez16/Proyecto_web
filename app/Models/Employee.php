@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Employee extends Model
 {
@@ -59,5 +60,24 @@ class Employee extends Model
     public function getAssignedEquipmentAttribute()
     {
         return $this->currentAssignments->load('inventory');
+    }
+
+    // SCOPE PARA FILTROS - AGREGADO
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('first_name', 'like', '%' . $search . '%')
+                    ->orWhere('last_name', 'like', '%' . $search . '%')
+                    ->orWhere('employee_id', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        });
+
+        $query->when($filters['active'] ?? false, function ($query, $active) {
+            $query->where('active', $active);
+        });
+
+        return $query;
     }
 }
