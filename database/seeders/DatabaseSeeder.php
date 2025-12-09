@@ -2,24 +2,38 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Crear usuario administrador
+        User::create([
+            'name' => 'Administrador',
+            'email' => 'admin@cmdb.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin'
         ]);
+
+        // Crear usuario operativo
+        User::create([
+            'name' => 'Usuario Operativo', 
+            'email' => 'operador@cmdb.com',
+            'password' => Hash::make('password'),
+            'role' => 'operational'
+        ]);
+
+        // Crear categorías por defecto
+        \App\Models\Category::create(['name' => 'Hardware', 'description' => 'Equipos físicos y componentes']);
+        \App\Models\Category::create(['name' => 'Software', 'description' => 'Licencias y aplicaciones']);
+        \App\Models\Category::create(['name' => 'Equipo de Red', 'description' => 'Dispositivos de networking']);
+        \App\Models\Category::create(['name' => 'Equipo de Cómputo', 'description' => 'Computadoras y laptops']);
+        \App\Models\Category::create(['name' => 'Equipo de Telefonía', 'description' => 'Teléfonos y dispositivos de comunicación']);
     }
 }
