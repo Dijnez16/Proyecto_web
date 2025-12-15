@@ -37,8 +37,9 @@
         }
         
         .equipment-card:hover {
-            transform: translateY(-2px);
+            transform: none;
         }
+
         
         .btn-primary {
             background: var(--primary);
