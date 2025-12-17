@@ -79,6 +79,24 @@ class InventoryController extends Controller
         return view('inventory.edit', compact('inventory', 'categories'));
     }
 
+    // Descartar equipo
+        public function discard(Request $request, Inventory $inventory)
+    {
+        $request->validate([
+            'discard_reason' => 'required|string',
+            'discard_notes' => 'nullable|string'
+        ]);
+
+        $inventory->update([
+            'status' => 'discard'
+        ]);
+
+        return redirect()
+            ->route('inventory.show', $inventory)
+            ->with('success', 'Equipo descartado correctamente');
+    }
+
+
     // Actualizar equipo
     public function update(Request $request, Inventory $inventory)
     {
@@ -129,7 +147,7 @@ class InventoryController extends Controller
     }
 /*
     // Generar código QR para equipo
-    public function generateQR(Inventory $inventory)
+    public function generateQRCode(Inventory $inventory)
     {
         $this->generateQRCode($inventory);
         return back()->with('success', 'Código QR generado correctamente.');

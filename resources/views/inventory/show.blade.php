@@ -11,6 +11,14 @@
         <a href="{{ route('inventory.edit', $inventory) }}" class="btn btn-outline-primary">
             <i class="fas fa-edit me-2"></i>Editar
         </a>
+        @if($inventory->status !== 'discard')
+            <button class="btn btn-sm btn-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#discardModal{{ $inventory->id }}">
+                <i class="fas fa-trash"></i> Descartar
+            </button>
+        @endif
+
         <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left me-2"></i>Volver
         </a>
@@ -213,4 +221,58 @@
         @endif
     </div>
 </div>
+<!-- MODAL DESCARTAR EQUIPO -->
+<div class="modal fade" id="discardModal{{ $inventory->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-trash me-2"></i>Descartar equipo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="POST" action="{{ route('inventory.discard', $inventory) }}">
+                @csrf
+                @method('PATCH')
+
+                <div class="modal-body">
+                    <p>
+                        ¿Estás seguro que deseas descartar el equipo
+                        <strong>{{ $inventory->name }}</strong>?
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label">Motivo del descarte *</label>
+                        <select name="discard_reason" class="form-select" required>
+                            <option value="">Seleccionar motivo</option>
+                            <option value="Fin de vida útil">Fin de vida útil</option>
+                            <option value="Daño irreparable">Daño irreparable</option>
+                            <option value="Obsoleto">Obsoleto</option>
+                            <option value="Donación">Donación</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea name="discard_notes" class="form-control" rows="3"
+                                  placeholder="Comentarios adicionales..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Confirmar descarte
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
 @endsection

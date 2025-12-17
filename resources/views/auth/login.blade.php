@@ -61,13 +61,7 @@
                             </button>
                         </div>
 
-                        <div class="text-center">
-                            <small class="text-muted">
-                                Credenciales de prueba:<br>
-                                Admin: admin@cmdb.com / password<br>
-                                Operador: operador@cmdb.com / password
-                            </small>
-                        </div>
+                       
                     </form>
                 </div>
             </div>
