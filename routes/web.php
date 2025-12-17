@@ -34,6 +34,8 @@ Route::middleware(['auth'])->group(function () {
     
     // Gestión de Inventario
     Route::resource('inventory', InventoryController::class);
+    Route::patch('/inventory/{inventory}/discard', [InventoryController::class, 'discard'])->name('inventory.discard');
+
 
     // Ruta para generar QR
     Route::post('/inventory/{inventory}/generate-qr', [InventoryController::class, 'generateQR'])->name('inventory.generate-qr');
